@@ -17,5 +17,5 @@ func getServer(domain string) {
 }
 
 func main() {
-	getServer("www.miputo.com")
+	getServer("www.google.com")
 }
