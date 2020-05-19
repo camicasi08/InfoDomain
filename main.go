@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"./services"
 )
 
 func main() {
-	fmt.Println("Hola")
-	//services.getServer("www.google.com")
+	
+	services.GetDomain("www.facebook.com")
+	//fmt.Println(string(result))
 }
