@@ -6,7 +6,7 @@ import (
 
 func main() {
 	
-	//services.GetDomain("www.facebook.com")
-	services.Whois("1.2.1.1")
+	services.GetDomain("www.unal.edu.co")
+	//services.Whois("45.5.164.11")
 	//fmt.Println(string(result))
 }
