@@ -106,7 +106,7 @@ func GetDomain(domain string) models.Response {
 		respuesta.Ssl_grade = ""
 	}
 	//fmt.Println("RESPONSE")
-	//fmt.Println(respuesta)
+	fmt.Println(respuesta)
 	return respuesta
 }
 

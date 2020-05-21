@@ -2,7 +2,7 @@ package services
 
 
 import (
-    "fmt"
+    //"fmt"
     "log"
     "net/http"
 	"github.com/PuerkitoBio/goquery"
