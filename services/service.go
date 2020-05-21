@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"encoding/json"
-	"reflect"
+	//"reflect"
 	"github.com/likexian/whois-go"
 	//"github.com/likexian/whois-parser-go"
 	"regexp"
@@ -31,7 +31,7 @@ var grades = map[string]int{
 
 
 
-func GetDomain(domain string) {
+func GetDomain(domain string) models.Response {
 	//response1, err1:= http.Get("https://api.ssllabs.com/api/v3/analyze?host=" + domain)
 	//fmt.Println(response1, err1)
 	response, err := http.Get("https://api.ssllabs.com/api/v3/analyze?host=" + domain)
@@ -39,6 +39,7 @@ func GetDomain(domain string) {
 	respuesta.Ssl_grade = "Current"
 	if err != nil {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
+		respuesta.Is_down= true
 	} else {
 		
 		defer response.Body.Close()
@@ -52,13 +53,18 @@ func GetDomain(domain string) {
 			fmt.Println("Error obteniendo endpoints")
 		}
 
-		fmt.Println(reflect.TypeOf(result))
+		//fmt.Println(reflect.TypeOf(result))
 		//fmt.Println(result)
-		fmt.Println(reflect.TypeOf(endpoints))
+		//fmt.Println(reflect.TypeOf(endpoints))
 		//fmt.Println(endpoints)
-	
+		//fmt.Println(result["status"])
+		if result["status"] == "ERROR" || result["status"] == "DNS"{
+			respuesta.Is_down = true
+		}
 	
 		var servers [] models.Server
+
+
 		//Access to endpoints 
 		
 		if endpoints != nil {
@@ -84,23 +90,24 @@ func GetDomain(domain string) {
 				}else if host != nil {
 					server.Address = host.(string)
 				}
-				//fmt.Println(grade, ipAddress, host) 
-				//fmt.Println(server)
+			
 				servers = append(servers, server)
 
 			}
-			fmt.Println("INFO SERVERS")
-			fmt.Println(servers)
+			//fmt.Println("INFO SERVERS")
+			//fmt.Println(servers)
 		}
-
+		respuesta.Logo, respuesta.Title = Scraper(domain)
 		respuesta.Servers = servers
-		if respuesta.Ssl_grade == "Current"{
-			respuesta.Ssl_grade = ""
-		}
-		fmt.Println("RESPONSE")
-		fmt.Println(respuesta)
+	
 	
 	}
+	if respuesta.Ssl_grade == "Current"{
+		respuesta.Ssl_grade = ""
+	}
+	//fmt.Println("RESPONSE")
+	//fmt.Println(respuesta)
+	return respuesta
 }
 
 func Whois(ip string)(string, string) {
@@ -119,32 +126,30 @@ func Whois(ip string)(string, string) {
 
 func  getOrganization(whois_raw string) string{
 	
-	r := regexp.MustCompile("orgname.+|org-name.+|organization.+")
-	var organization string
+	r := regexp.MustCompile("owner.+|orgname.+|org-name.+|organization.+")
+	organization := ""
 	if r.MatchString(strings.ToLower(whois_raw)) {
 		organization = r.FindString(strings.ToLower(whois_raw))
 		array := strings.Split(organization, ":")
 		organization =strings.Trim(array[1], " ")
 		return organization
 		
-	}else{
-		return ""
 	}
+	return organization
 
 }
 
 func  getCountry(whois_raw string) string{
 	
 	r := regexp.MustCompile("country.+")
-	var country string
+	country := ""
 	if r.MatchString(strings.ToLower(whois_raw)) {
 		country = r.FindString(strings.ToLower(whois_raw))
 		array := strings.Split(country, ":")
 		country =strings.Trim(array[1], " ")
 		return country
 		
-	}else{
-		return ""
 	}
+	return country
 
 }
