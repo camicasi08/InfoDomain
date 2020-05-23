@@ -30,12 +30,13 @@ var grades = map[string]int{
 }
 
 //GetDomain : Funciòn para obtener información desde el API SSL
-func GetDomain(domain string) models.Response {
+func GetDomain(domain string) models.Domain {
 	//response1, err1:= http.Get("https://api.ssllabs.com/api/v3/analyze?host=" + domain)
 	//fmt.Println(response1, err1)
 	response, err := http.Get("https://api.ssllabs.com/api/v3/analyze?host=" + domain)
-	var respuesta models.Response
+	var respuesta models.Domain
 	respuesta.Ssl_grade = "Current"
+	respuesta.Name = domain
 	if err != nil {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
 		respuesta.Is_down = true
