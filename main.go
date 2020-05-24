@@ -9,13 +9,31 @@ import (
 	"log"
 )
 
+var (
+	corsAllowHeaders     = "authorization"
+	corsAllowMethods     = "HEAD,GET,POST,PUT,DELETE,OPTIONS"
+	corsAllowOrigin      = "*"
+	corsAllowCredentials = "true"
+)
+
+func CORS(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+	return func(ctx *fasthttp.RequestCtx) {
+
+		ctx.Response.Header.Set("Access-Control-Allow-Credentials", corsAllowCredentials)
+		ctx.Response.Header.Set("Access-Control-Allow-Headers", corsAllowHeaders)
+		ctx.Response.Header.Set("Access-Control-Allow-Methods", corsAllowMethods)
+		ctx.Response.Header.Set("Access-Control-Allow-Origin", corsAllowOrigin)
+
+		next(ctx)
+	}
+}
 func main() {
 
 	router := fasthttprouter.New()
 
 	router.GET("/info/:domain", controllers.GetInfoDomain)
-
-	log.Fatal(fasthttp.ListenAndServe(":3000", router.Handler))
+	router.GET("/recents", controllers.GetRecentDomains)
+	log.Fatal(fasthttp.ListenAndServe(":3000", CORS(router.Handler)))
 	//services.GetDomain("rappi.com")
 	//services.Whois("45.5.164.11")
 	//fmt.Println(string(result))

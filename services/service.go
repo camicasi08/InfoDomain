@@ -104,7 +104,7 @@ func GetDomain(domain string) models.Domain {
 		respuesta.Ssl_grade = ""
 	}
 	//fmt.Println("RESPONSE")
-	fmt.Println(respuesta)
+	//fmt.Println(respuesta)
 	return respuesta
 }
 
@@ -146,6 +146,16 @@ func getCountry(whoisRaw string) string {
 		country = r.FindString(strings.ToLower(whoisRaw))
 		array := strings.Split(country, ":")
 		country = strings.Trim(array[1], " ")
+		if len(country) > 2 {
+			//fmt.Println("country 1")
+			sub := []rune(country)
+			newcountry := string(sub[0:3])
+			newcountry = strings.Trim(newcountry, " ")
+			//fmt.Println(newcountry)
+			country = newcountry
+			//country = strings.Trim(array[1], " ")
+
+		}
 		return country
 
 	}

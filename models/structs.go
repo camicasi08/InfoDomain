@@ -6,7 +6,7 @@ type Server struct {
 	Ssl_grade string `json:"ssl_grade"`
 	Country   string `json:"country"`
 	Owner     string `json:"owner"`
-	Id        int    `json:"id"`
+	Id        int    `json:"-"`
 }
 
 //Response struct
@@ -18,6 +18,6 @@ type Domain struct {
 	Logo               string   `json:"logo"`
 	Title              string   `json:"title"`
 	Is_down            bool     `json:"is_down"`
-	Id                 int      `json:"id"`
+	Id                 int      `json:"-"`
 	Name               string   `json:"name"`
 }
