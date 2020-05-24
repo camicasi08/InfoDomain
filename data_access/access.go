@@ -62,7 +62,7 @@ func AddDomain(db *sql.DB, domain models.Domain) {
 
 	insertedID := 0
 	query := fmt.Sprintf(`INSERT INTO public."domain" (id, "name", ssl_grade, previous_ssl_grade, is_down, servers_changed, title, logo, created, updated)
-	VALUES(unique_rowid(), '%s', '%s', '%s', %t, %t, '%s', '%s', now(), now()) RETURNING id;`, domain.Name, domain.Ssl_grade, domain.Previous_ssl_grade, domain.Is_down, domain.Servers_changed, domain.Logo, domain.Title)
+	VALUES(unique_rowid(), '%s', '%s', '%s', %t, %t, '%s', '%s', now(), now()) RETURNING id;`, domain.Name, domain.Ssl_grade, domain.Previous_ssl_grade, domain.Is_down, domain.Servers_changed, domain.Title, domain.Logo)
 	err := db.QueryRow(query).Scan(&insertedID)
 	fmt.Printf("ID: %d", insertedID)
 	if err == nil {
