@@ -32,7 +32,7 @@ $ npm run serve
 
 ##### /info/:domain
 Retorna la información del dominio consutlado en la siguiente estructura JSON:
-```json
+```yaml
 {
     “servers”: [
         {
