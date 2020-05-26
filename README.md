@@ -30,7 +30,7 @@ $ npm run serve
 ### Consumo del API
 ##### Endpoints
 
-##### /info/:domain
+##### GET: /info/:domain
 Retorna la información del dominio consutlado en la siguiente estructura JSON:
 ```yaml
 {
@@ -62,6 +62,6 @@ Retorna la información del dominio consutlado en la siguiente estructura JSON:
     “is_down”: false
 }
 ```
-##### /recents
+##### GET: /recents
 Retorna la información de los dominios consultados recientemente.
 
