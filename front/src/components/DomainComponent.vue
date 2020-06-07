@@ -22,7 +22,10 @@
                                 <h4 v-else class="text-center">{{domain.name}}</h4>
                             </div>
                             <div class="col col-md-1 align-self-center">
-                                <h4><span class="badge badge-success">{{domain.ssl_grade}}</span></h4>
+                                <h4><span class="badge badge-danger" title="Previous SSL Grade">{{domain.previous_ssl_grade}}</span></h4>
+                            </div>
+                            <div class="col col-md-1 align-self-center">
+                                <h4><span class="badge badge-success" title="SSL Grade">{{domain.ssl_grade}}</span></h4>
                             </div>
 
                             <div class="col col-md-2">
@@ -32,16 +35,16 @@
                     </div>
                     <b-collapse v-bind:id="domain.name" class="mt-2">
                         <div class="row">
-                            <div class="col col-2">
+                            <div class="col col-3">
                                  <div class="form-check">
                                     <input type="checkbox" class="form-check-input" v-bind:value="domain.is_down" disabled>
-                                    <label class="form-check-label">Is Down?</label>
+                                    <label class="form-check-label">¿No Responde?</label>
                              </div>
                             </div>
-                            <div class="col col-3">
+                            <div class="col col-4">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" v-bind:value="domain.servers_changed" disabled>
-                                    <label class="form-check-label">Servers changed?</label>
+                                    <label class="form-check-label">¿Cambiaron los servidores?</label>
                                 </div>
                             </div>
                         </div>
@@ -52,10 +55,10 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                <th scope="col">Address</th>
-                                <th scope="col">Owner</th>
-                                <th scope="col">Country</th>
-                                <th scope="col">SSL Grade</th>
+                                <th scope="col">Dirección</th>
+                                <th scope="col">Propietario</th>
+                                <th scope="col">País</th>
+                                <th scope="col">Grado SSL</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -66,7 +69,7 @@
                                     <td> {{server.address}}</td>
                                     <td class="text-capitalize"> {{server.owner}}</td>
                                     <td class="text-uppercase"> {{server.country}}</td>
-                                    <td> <span class="badge badge-success">{{server.ssl_grade}}</span></td>
+                                    <td> <span class="badge badge-success" title="SSL Grade">{{server.ssl_grade}}</span></td>
                                 </tr>
                             </tbody>
                         </table>

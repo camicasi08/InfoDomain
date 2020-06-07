@@ -99,7 +99,7 @@ func getServersByDomain(db *sql.DB, idDomain int) []models.Server {
 			log.Fatal(err)
 		}
 
-		server.Id = id
+		//server.Id = id
 		server.Address = address
 		server.Ssl_grade = sslGrade
 		server.Owner = owner
@@ -114,8 +114,8 @@ func getServersByDomain(db *sql.DB, idDomain int) []models.Server {
 
 func AddServer(db *sql.DB, server models.Server, idDomain int) {
 	query := fmt.Sprintf(`INSERT INTO public."server"
-		(id, id_domain, address, owner, country, ssl_grade, created, updated, rowid)
-		VALUES(unique_rowid(), %d, '%s', '%s', '%s', '%s', now(), now(), unique_rowid()); `,
+		(id, id_domain, address, owner, country, ssl_grade, created, updated)
+		VALUES(unique_rowid(), %d, '%s', '%s', '%s', '%s', now(), now()); `,
 		idDomain, server.Address, server.Owner, server.Country, server.Ssl_grade)
 
 	//fmt.Print(query)
@@ -169,8 +169,8 @@ func FindDomainByName(db *sql.DB, nameDomain string) models.Domain {
 func UpdateDomain(db *sql.DB, domain models.Domain, idDomain int) {
 	sqlStatement := fmt.Sprintf(`
 		UPDATE domain
-		SET ssl_grade = '%s', name = '%s', logo = '%s', title = '%s', is_down = %t, servers_changed = %t, updated = now()
-		WHERE id = %d;`, domain.Ssl_grade, domain.Name, domain.Logo, domain.Title, domain.Is_down, domain.Servers_changed, idDomain)
+		SET ssl_grade = '%s',previous_ssl_grade = '%s', name = '%s', logo = '%s', title = '%s', is_down = %t, servers_changed = %t, updated = now()
+		WHERE id = %d;`, domain.Ssl_grade, domain.Previous_ssl_grade, domain.Name, domain.Logo, domain.Title, domain.Is_down, domain.Servers_changed, idDomain)
 	res, err := db.Exec(sqlStatement)
 	if err != nil {
 		panic(err)

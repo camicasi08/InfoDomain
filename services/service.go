@@ -31,80 +31,88 @@ var grades = map[string]int{
 
 //GetDomain : Funciòn para obtener información desde el API SSL
 func GetDomain(domain string) models.Domain {
-	//response1, err1:= http.Get("https://api.ssllabs.com/api/v3/analyze?host=" + domain)
-	//fmt.Println(response1, err1)
-	response, err := http.Get("https://api.ssllabs.com/api/v3/analyze?host=" + domain)
 	var respuesta models.Domain
-	respuesta.Ssl_grade = "Current"
-	respuesta.Name = domain
-	if err != nil {
-		fmt.Printf("The HTTP request failed with error %s\n", err)
+	response1, err1 := http.Get("https://api.ssllabs.com/api/v3/analyze?host=" + domain)
+	if err1 != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err1)
 		respuesta.Is_down = true
 	} else {
+		fmt.Println(response1.Body)
+		response, err := http.Get("https://api.ssllabs.com/api/v3/analyze?host=" + domain)
 
-		defer response.Body.Close()
-		data, _ := ioutil.ReadAll(response.Body)
-		jsonResult := string(data)
-		//fmt.Println(jsonResult)
-		var result map[string]interface{}
-		json.Unmarshal([]byte(jsonResult), &result)
-		endpoints, ok := result["endpoints"].([]interface{})
-		if !ok {
-			fmt.Println("Error obteniendo endpoints")
-		}
-
-		//fmt.Println(reflect.TypeOf(result))
-		//fmt.Println(result)
-		//fmt.Println(reflect.TypeOf(endpoints))
-		//fmt.Println(endpoints)
-		//fmt.Println(result["status"])
-		if result["status"] == "ERROR" || result["status"] == "DNS" {
+		respuesta.Ssl_grade = "Current"
+		respuesta.Name = domain
+		if err != nil {
+			fmt.Printf("The HTTP request failed with error %s\n", err)
 			respuesta.Is_down = true
-		}
+		} else {
 
-		var servers []models.Server
-
-		//Access to endpoints
-
-		if endpoints != nil {
-			for _, m := range endpoints {
-				endpoint := m.(map[string]interface{})
-				var server models.Server
-				grade := endpoint["grade"]
-				ipAddress := endpoint["ipAddress"]
-				host := endpoint["serverName"]
-				if grade != nil {
-					server.Ssl_grade = grade.(string)
-					if grades[server.Ssl_grade] < grades[respuesta.Ssl_grade] {
-						respuesta.Ssl_grade = server.Ssl_grade
-					}
-				}
-
-				if ipAddress != nil {
-					server.Address = ipAddress.(string)
-					organization, country := Whois(server.Address)
-					server.Owner = organization
-					server.Country = country
-
-				} else if host != nil {
-					server.Address = host.(string)
-				}
-
-				servers = append(servers, server)
-
+			defer response.Body.Close()
+			data, _ := ioutil.ReadAll(response.Body)
+			jsonResult := string(data)
+			//fmt.Println(jsonResult)
+			var result map[string]interface{}
+			json.Unmarshal([]byte(jsonResult), &result)
+			endpoints, ok := result["endpoints"].([]interface{})
+			if !ok {
+				fmt.Println("Error obteniendo endpoints")
 			}
-			//fmt.Println("INFO SERVERS")
-			//fmt.Println(servers)
-		}
-		respuesta.Title, respuesta.Logo = Scraper(domain)
-		respuesta.Servers = servers
 
+			//fmt.Println(reflect.TypeOf(result))
+			//fmt.Println(result)
+			//fmt.Println(reflect.TypeOf(endpoints))
+			//fmt.Println(endpoints)
+			//fmt.Println(result["status"])
+			if result["status"] == "ERROR" || result["status"] == "DNS" {
+				respuesta.Is_down = true
+			}
+
+			var servers []models.Server
+
+			//Access to endpoints
+
+			if endpoints != nil {
+				for _, m := range endpoints {
+					endpoint := m.(map[string]interface{})
+					var server models.Server
+					grade := endpoint["grade"]
+					ipAddress := endpoint["ipAddress"]
+					host := endpoint["serverName"]
+					if grade != nil {
+						server.Ssl_grade = grade.(string)
+						if grades[server.Ssl_grade] < grades[respuesta.Ssl_grade] {
+							respuesta.Ssl_grade = server.Ssl_grade
+						}
+					}
+
+					if ipAddress != nil {
+						server.Address = ipAddress.(string)
+						organization, country := Whois(server.Address)
+						server.Owner = organization
+						server.Country = country
+
+					} else if host != nil {
+						server.Address = host.(string)
+					}
+
+					servers = append(servers, server)
+
+				}
+				//fmt.Println("INFO SERVERS")
+				//fmt.Println(servers)
+			}
+			respuesta.Title, respuesta.Logo = Scraper(domain)
+			respuesta.Servers = servers
+
+		}
+		if respuesta.Ssl_grade == "Current" {
+			respuesta.Ssl_grade = ""
+		}
+		//fmt.Println("RESPONSE")
+		//fmt.Println(respuesta)
 	}
-	if respuesta.Ssl_grade == "Current" {
-		respuesta.Ssl_grade = ""
-	}
-	//fmt.Println("RESPONSE")
-	//fmt.Println(respuesta)
+	//fmt.Println(response1, err1)
+
 	return respuesta
 }
 
