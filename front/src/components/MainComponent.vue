@@ -13,7 +13,7 @@
             <div class="input-group mb-3">
                 <input type="text" class="form-control form-control-lg" 
                 placeholder="domain.com" aria-label="domain.com" aria-describedby="basic-addon2"
-                v-on:keydown.enter="getInfoDomain" v-model="domain"  required>
+                v-on:keydown.enter.prevent="getInfoDomain" v-model="domain"  required>
             </div>
         </div>
     </div>

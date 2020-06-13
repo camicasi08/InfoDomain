@@ -2,17 +2,15 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
-	//"reflect"
-	"github.com/likexian/whois-go"
-	//"github.com/likexian/whois-parser-go"
 	"regexp"
 	"strings"
 
 	"../models"
+	"github.com/likexian/whois-go"
 )
 
 var grades = map[string]int{
@@ -30,11 +28,13 @@ var grades = map[string]int{
 }
 
 //GetDomain : Funciòn para obtener información desde el API SSL
-func GetDomain(domain string) models.Domain {
+func GetDomain(domain string) (models.Domain, error) {
 	var respuesta models.Domain
+	var error1 error
 	response1, err1 := http.Get("https://api.ssllabs.com/api/v3/analyze?host=" + domain)
 	if err1 != nil {
 		fmt.Printf("The HTTP request failed with error %s\n", err1)
+		error1 = errors.New("The HTTP request failed with errors")
 		respuesta.Is_down = true
 	} else {
 		fmt.Println(response1.Body)
@@ -44,25 +44,19 @@ func GetDomain(domain string) models.Domain {
 		respuesta.Name = domain
 		if err != nil {
 			fmt.Printf("The HTTP request failed with error %s\n", err)
+			error1 = errors.New("The HTTP request failed with errors")
 			respuesta.Is_down = true
 		} else {
 
 			defer response.Body.Close()
 			data, _ := ioutil.ReadAll(response.Body)
 			jsonResult := string(data)
-			//fmt.Println(jsonResult)
 			var result map[string]interface{}
 			json.Unmarshal([]byte(jsonResult), &result)
 			endpoints, ok := result["endpoints"].([]interface{})
 			if !ok {
 				fmt.Println("Error obteniendo endpoints")
 			}
-
-			//fmt.Println(reflect.TypeOf(result))
-			//fmt.Println(result)
-			//fmt.Println(reflect.TypeOf(endpoints))
-			//fmt.Println(endpoints)
-			//fmt.Println(result["status"])
 			if result["status"] == "ERROR" || result["status"] == "DNS" {
 				respuesta.Is_down = true
 			}
@@ -111,9 +105,13 @@ func GetDomain(domain string) models.Domain {
 		//fmt.Println("RESPONSE")
 		//fmt.Println(respuesta)
 	}
-	//fmt.Println(response1, err1)
 
-	return respuesta
+	if error1 != nil {
+		return respuesta, error1
+	} else {
+		return respuesta, nil
+	}
+
 }
 
 //Whois : Implementación del método Whois para obtener información de los servidores

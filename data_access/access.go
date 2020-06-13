@@ -3,7 +3,7 @@ package data_access
 import (
 	"database/sql"
 	"fmt"
-	"log"
+	"time"
 
 	"../models"
 	_ "github.com/lib/pq"
@@ -12,7 +12,7 @@ import (
 func Connect() *sql.DB {
 	db, err := sql.Open("postgres", "postgresql://root@localhost:26257/Info_Domain?sslmode=disable")
 	if err != nil {
-		log.Fatal("error connecting to the database: ", err)
+		fmt.Print("error connecting to the database: ", err)
 	}
 	return db
 }
@@ -25,7 +25,7 @@ func GetDomains(db *sql.DB) []models.Domain {
 	d.is_down, logo, title FROM domain d ORDER BY updated DESC;`
 	rows, err := db.Query(query)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Print(err)
 	}
 	var domains []models.Domain
 	defer rows.Close()
@@ -39,7 +39,7 @@ func GetDomains(db *sql.DB) []models.Domain {
 		var logo string
 		var title string
 		if err := rows.Scan(&id, &name, &sslGrade, &previousSslGrade, &serversChanged, &isDown, &logo, &title); err != nil {
-			log.Fatal(err)
+			fmt.Print(err)
 		}
 		var domain models.Domain
 		domain.Id = id
@@ -72,14 +72,6 @@ func AddDomain(db *sql.DB, domain models.Domain) {
 			AddServer(db, elem, insertedID)
 		}
 	}
-	/*
-		fmt.Print(query)
-		if _, err := db.Exec(
-			query); err != nil {
-			log.Fatal(err)
-		} else {
-
-		} */
 }
 
 func getServersByDomain(db *sql.DB, idDomain int) []models.Server {
@@ -87,7 +79,7 @@ func getServersByDomain(db *sql.DB, idDomain int) []models.Server {
 	query := fmt.Sprintf(`SELECT id, address, ssl_grade, owner, country FROM server WHERE id_domain = %d`, idDomain)
 	rows, err := db.Query(query)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Print(err)
 	}
 
 	defer rows.Close()
@@ -96,7 +88,7 @@ func getServersByDomain(db *sql.DB, idDomain int) []models.Server {
 		var id int
 		var sslGrade, address, owner, country string
 		if err := rows.Scan(&id, &address, &sslGrade, &owner, &country); err != nil {
-			log.Fatal(err)
+			fmt.Print(err)
 		}
 
 		//server.Id = id
@@ -121,7 +113,7 @@ func AddServer(db *sql.DB, server models.Server, idDomain int) {
 	//fmt.Print(query)
 	if _, err := db.Exec(
 		query); err != nil {
-		log.Fatal(err)
+		fmt.Print(err)
 	}
 }
 
@@ -130,7 +122,7 @@ func FindDomainByName(db *sql.DB, nameDomain string) models.Domain {
 	d.ssl_grade,
 	d.previous_ssl_grade,
 	d.servers_changed,
-	d.is_down, logo, title FROM domain d WHERE name = '%s';`, nameDomain)
+	d.is_down, logo, title, updated FROM domain d WHERE name = '%s';`, nameDomain)
 	var id int
 	var name string
 	var sslGrade string
@@ -139,12 +131,13 @@ func FindDomainByName(db *sql.DB, nameDomain string) models.Domain {
 	var isDown bool
 	var logo string
 	var title string
+	var updated time.Time
 	//var servers []models.Server
 
 	var domain models.Domain
 
 	row := db.QueryRow(query)
-	switch err := row.Scan(&id, &name, &sslGrade, &previousSslGrade, &serversChanged, &isDown, &logo, &title); err {
+	switch err := row.Scan(&id, &name, &sslGrade, &previousSslGrade, &serversChanged, &isDown, &logo, &title, &updated); err {
 	case sql.ErrNoRows:
 		fmt.Println("No rows were returned!")
 	case nil:
@@ -156,6 +149,7 @@ func FindDomainByName(db *sql.DB, nameDomain string) models.Domain {
 		domain.Is_down = isDown
 		domain.Logo = logo
 		domain.Title = title
+		domain.Updated = updated
 		domain.Servers = getServersByDomain(db, domain.Id)
 	default:
 		panic(err)

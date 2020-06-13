@@ -37,13 +37,16 @@
                         <div class="row">
                             <div class="col col-3">
                                  <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" v-bind:value="domain.is_down" disabled>
+                                     
+                                    <input v-if="domain.is_down" type="checkbox" class="form-check-input" v-bind:value="domain.is_down" disabled checked>
+                                    <input v-else type="checkbox" class="form-check-input" v-bind:value="domain.is_down" disabled>
                                     <label class="form-check-label">¿No Responde?</label>
                              </div>
                             </div>
                             <div class="col col-4">
                                 <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" v-bind:value="domain.servers_changed" disabled>
+                                    <input v-if="domain.servers_changed" type="checkbox" class="form-check-input" v-bind:value="domain.servers_changed" disabled checked>
+                                    <input v-else type="checkbox" class="form-check-input" v-bind:value="domain.servers_changed" disabled>
                                     <label class="form-check-label">¿Cambiaron los servidores?</label>
                                 </div>
                             </div>

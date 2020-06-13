@@ -34,7 +34,5 @@ func main() {
 	router.GET("/info/:domain", controllers.GetInfoDomain)
 	router.GET("/recents", controllers.GetRecentDomains)
 	log.Fatal(fasthttp.ListenAndServe(":3000", CORS(router.Handler)))
-	//services.GetDomain("rappi.com")
-	//services.Whois("45.5.164.11")
-	//fmt.Println(string(result))
+
 }
