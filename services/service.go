@@ -95,7 +95,7 @@ func GetDomain(domain string) (models.Domain, error) {
 				//fmt.Println("INFO SERVERS")
 				//fmt.Println(servers)
 			}
-			respuesta.Title, respuesta.Logo = Scraper(domain)
+			respuesta.Title, respuesta.Logo, error1 = Scraper(domain)
 			respuesta.Servers = servers
 
 		}
